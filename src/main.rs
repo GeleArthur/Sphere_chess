@@ -1,5 +1,3 @@
-use std::ops::Mul;
-
 use bevy::{
     input::mouse::MouseMotion,
     math::*,
@@ -144,58 +142,19 @@ fn camera_sphere_select(
         let raycasted = from_screenspace(_position, camera_pos.0, camera_pos.1).unwrap();
         let mut giz_transform = gizmos_cube.single_mut();
 
-        let diraction = Vec3::new(raycasted.0.x, raycasted.0.y, raycasted.0.z)
-            + Vec3::new(raycasted.1.x, raycasted.1.y, raycasted.1.z).mul(1.0);
-
         let sphere = sphere.single();
-
         let to_sphere = raycasted.0 - sphere.center;
-        let distance_to_sphere = to_sphere.length();
 
-        if sphere.radius * 2.0 > distance_to_sphere {
-            print!("We are inside {} {}\n", distance_to_sphere, sphere.radius);
-            return;
+        let v = to_sphere - Vec3::project_onto(to_sphere, raycasted.1);
+        let v_squerd = v.dot(v);
+        let r_squard = sphere.radius * sphere.radius;
+
+        if v_squerd <= r_squard {
+            let collison_point =
+                sphere.center + v - (raycasted.1.normalize() * (f32::sqrt(r_squard - v_squerd)));
+            giz_transform.translation = collison_point;
+            print!("{}\n", collison_point)
         }
-
-        let result = to_sphere.normalize().dot(raycasted.1.normalize());
-
-        if result <= 0.0 {
-            let v = to_sphere - Vec3::project_onto(to_sphere, raycasted.1);
-            let v_squerd = v.dot(v);
-            let r_squard = sphere.radius * sphere.radius;
-
-            if v_squerd <= r_squard {
-                giz_transform.translation = sphere.center + v - (raycasted.1.normalize() * (f32::sqrt(r_squard-v_squerd)))
-            }
-        } else {
-            print!("No collison")
-        }
-
-        // giz_transform.translation = diraction;
-
-        // let A = Vec3::new(pos.0.x, pos.0.y, pos.0.z);
-        // let d = Vec3::new(pos.1.x, pos.1.y, pos.1.z);
-
-        // let C = Vec3::ZERO;
-        // let r = 5.0;
-        // let rSquared = r*r;
-
-        // let CA = A-C;
-
-        // let v = CA - Vec3::project_onto(CA, d);
-        // let vSquared = Vec3::dot(v,v);
-
-        // let collisionPoint;
-
-        // if vSquared <= rSquared {
-        //     collisionPoint = C + v - (d.normalize() * f32::sqrt(rSquared-vSquared));
-        // }else{
-        //     collisionPoint = Vec3::ZERO;
-        // }
-
-        // giz_transform.translation = collisionPoint;
-
-        // print!("{} {} {} \n", collisionPoint.x, collisionPoint.y, collisionPoint.z);
     }
 }
 
