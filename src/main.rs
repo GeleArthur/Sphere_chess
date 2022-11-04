@@ -1,3 +1,5 @@
+use std::f32::consts::PI;
+
 use bevy::{
     input::mouse::MouseMotion,
     math::*,
@@ -59,10 +61,12 @@ fn setup_scene(
         .insert_bundle(PbrBundle {
             mesh: meshes.add(Mesh::from(shape::UVSphere {
                 radius: radius,
+                sectors:8,
+                stacks: 3,
                 ..Default::default()
             })),
             material: materials.add(Color::rgb(0.0, 1.0, 0.0).into()),
-            transform: Transform::from_xyz(0.0, 0.0, 0.0),
+            transform: Transform::from_xyz(0.0, 0.0, 0.0).with_rotation(Quat::from_euler(EulerRot::XYZ, PI/2.0, 0.0, 0.0)),
             ..Default::default()
         })
         .insert(Wireframe)
@@ -150,10 +154,17 @@ fn camera_sphere_select(
         let r_squard = sphere.radius * sphere.radius;
 
         if v_squerd <= r_squard {
-            let collison_point =
-                sphere.center + v - (raycasted.1.normalize() * (f32::sqrt(r_squard - v_squerd)));
-            giz_transform.translation = collison_point;
-            print!("{}\n", collison_point)
+            let collison_point = sphere.center + v - (raycasted.1.normalize() * (f32::sqrt(r_squard - v_squerd)));
+
+            let pitch = f32::atan2(collison_point.x, collison_point.z);
+            let yaw = collison_point.y;
+
+
+            let converted_pos = Vec3::new(pitch.sin(), yaw, pitch.cos());
+
+            giz_transform.translation = converted_pos;
+            
+            print!("pitch:{} yaw:{}\n", pitch, yaw);
         }
     }
 }
