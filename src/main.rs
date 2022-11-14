@@ -1,3 +1,6 @@
+pub mod util;
+
+
 use std::f32::consts::PI;
 
 use bevy::{
@@ -61,8 +64,8 @@ fn setup_scene(
         .insert_bundle(PbrBundle {
             mesh: meshes.add(Mesh::from(shape::UVSphere {
                 radius: radius,
-                // sectors:8,
-                // stacks: 3,
+                sectors:8,
+                stacks: 8,
                 ..Default::default()
             })),
             material: materials.add(Color::rgba(0.0, 1.0, 0.0, 0.1).into()),
@@ -162,11 +165,15 @@ fn camera_sphere_select(
         let hit = ray_hit.unwrap();
 
         let stack_sector = sphere_position_to_stacks_and_sectors(hit, sphere.radius);
-        // print!("{} {}\n", stack_sector.0, stack_sector.1);
-        let position_ss = stacks_and_sectors_to_sphere_position(stack_sector.0, stack_sector.1, sphere.radius);
-        // print!("{}\n", position_ss);
 
+        let sector = std::f32::consts::PI + stack_sector.1;
+        let stack = stack_sector.0;
 
+        print!("{}\n", stack);
+
+        // util::map(stack_sector.0, 0.0, stop1, start2, stop2)
+
+        let position_ss = stacks_and_sectors_to_sphere_position(stack, sector, sphere.radius);
 
         giz_transform.translation = position_ss;
 
@@ -216,22 +223,19 @@ fn raycast_ball(ray_cast: (Vec3, Vec3), sphere_position: Vec3, sphere_radius: f3
 
 // thanks tibor and ruben :D
 fn sphere_position_to_stacks_and_sectors(position: Vec3, radius: f32) -> (f32,f32){
-    let phi = f32::atan2(position.y, position.x);
-    let theta = f32::asin(position.z);
-
-    print!("{phi}, {theta}\n");
-
+    let phi = f32::atan2(position.z, position.x);
+    let theta = f32::asin(position.y / radius);
 
     return (theta, phi);
 }
 
 
 fn stacks_and_sectors_to_sphere_position(stack: f32 /*pi/2 to -pi/2*/, sector: f32 /*0 to 2pi*/, radius: f32) -> Vec3{
-    let xy = radius * stack.cos();
-    let x = xy * sector.cos();
-    let y = xy * sector.sin();
-
-    let z = radius * stack.sin();
+    let y = radius * stack.sin();
+    
+    let xz = radius * stack.cos();
+    let x = xz * sector.cos();
+    let z = xz * stack.sin();
 
     return Vec3::new(x, y, z);
 }
