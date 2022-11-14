@@ -17,7 +17,7 @@ struct CameraRotation {
 
 #[derive(Reflect, Component, Default)]
 #[reflect(Component)]
-struct GizmosCube {}
+struct GizmosCube;
 
 #[derive(Reflect, Component, Default)]
 #[reflect(Component)]
@@ -65,8 +65,13 @@ fn setup_scene(
                 // stacks: 3,
                 ..Default::default()
             })),
-            material: materials.add(Color::rgb(0.0, 1.0, 0.0).into()),
-            transform: Transform::from_xyz(0.0, 0.0, 0.0).with_rotation(Quat::from_euler(EulerRot::XYZ, PI/2.0, 0.0, 0.0)),
+            material: materials.add(Color::rgba(0.0, 1.0, 0.0, 0.1).into()),
+            transform: Transform::from_xyz(0.0, 0.0, 0.0).with_rotation(Quat::from_euler(
+                EulerRot::XYZ,
+                PI / 2.0,
+                0.0,
+                0.0,
+            )),
             ..Default::default()
         })
         .insert(Wireframe)
@@ -100,7 +105,7 @@ fn setup_scene(
             material: materials.add(Color::rgb(1.0, 0.0, 0.1).into()),
             ..Default::default()
         })
-        .insert(GizmosCube {})
+        .insert(GizmosCube)
         .insert(Name::new("Gizmos"));
 }
 
@@ -140,41 +145,100 @@ fn camera_sphere_select(
 ) {
     let window = windows.get_primary().unwrap();
 
-    if let Some(_position) = window.cursor_position() {
+    if let Some(mouse_position) = window.cursor_position() {
         let camera_pos = camera.single();
 
-        let raycasted = from_screenspace(_position, camera_pos.0, camera_pos.1).unwrap();
+        let raycasted = from_screenspace(mouse_position, camera_pos.0, camera_pos.1).unwrap();
         let mut giz_transform = gizmos_cube.single_mut();
 
         let sphere = sphere.single();
-        let to_sphere = raycasted.0 - sphere.center;
 
-        let v = to_sphere - Vec3::project_onto(to_sphere, raycasted.1);
-        let v_squerd = v.dot(v);
-        let r_squard = sphere.radius * sphere.radius;
+        let ray_hit = raycast_ball(raycasted, sphere.center, sphere.radius);
 
-        if v_squerd <= r_squard {
-            let collison_point = sphere.center + v - (raycasted.1.normalize() * (f32::sqrt(r_squard - v_squerd)));
-
-            giz_transform.translation = collison_point;
-
-            let pitch = f32::atan2(collison_point.x, collison_point.z);
-            let yaw = collison_point.y;
-
-            let xy = yaw.cos();
-            let x = xy * pitch.cos();
-            let y = xy * pitch.sin();
-
-            let converted_pos = Vec3::new(x, yaw, y);
-
-            giz_transform.translation = converted_pos;
-            
-            print!("pitch:{} yaw:{}\n", pitch, yaw);
+        if ray_hit.is_none() {
+            return;
         }
+
+        let hit = ray_hit.unwrap();
+
+        let stack_sector = sphere_position_to_stacks_and_sectors(hit, sphere.radius);
+        // print!("{} {}\n", stack_sector.0, stack_sector.1);
+        let position_ss = stacks_and_sectors_to_sphere_position(stack_sector.0, stack_sector.1, sphere.radius);
+        // print!("{}\n", position_ss);
+
+
+
+        giz_transform.translation = position_ss;
+
+        //giz_transform.translation = to_sphere - Vec3::project_onto(to_sphere, raycasted.1);
+
+        //let v = to_sphere - Vec3::project_onto(to_sphere, raycasted.1);
+        // let v_squerd = v.dot(v);
+        // let r_squard = sphere.radius * sphere.radius;
+
+        // if v_squerd <= r_squard {
+        //     let collison_point =
+        //         sphere.center + v - (raycasted.1.normalize() * (f32::sqrt(r_squard - v_squerd)));
+
+        //     giz_transform.translation = collison_point;
+
+        //     let pitch = f32::atan2(collison_point.x, collison_point.z);
+        //     let yaw = collison_point.y;
+
+        //     let xy = yaw.cos();
+        //     let x = xy * pitch.cos();
+        //     let y = xy * pitch.sin();
+
+        //     let converted_pos = Vec3::new(x, yaw, y);
+
+        //     giz_transform.translation = converted_pos;
+
+        //     print!("pitch:{} yaw:{}\n", pitch, yaw);
+        // }
     }
 }
 
-pub fn from_screenspace(
+fn raycast_ball(ray_cast: (Vec3, Vec3), sphere_position: Vec3, sphere_radius: f32) -> Option<Vec3> {
+    let to_sphere = ray_cast.0 - sphere_position;
+
+    let v = to_sphere - Vec3::project_onto(to_sphere, ray_cast.1.normalize());
+    let v_squard = v.dot(v);
+    let r_squard = sphere_radius * sphere_radius;
+
+    if v_squard <= r_squard {
+        return Some(
+            sphere_position + v - (ray_cast.1.normalize() * (f32::sqrt(r_squard - v_squard))),
+        );
+    } else {
+        return None;
+    }
+}
+
+// thanks tibor and ruben :D
+fn sphere_position_to_stacks_and_sectors(position: Vec3, radius: f32) -> (f32,f32){
+    let stack_angle = (position.z/radius).asin();
+
+
+    let sector_angle = (position.x/(radius*stack_angle.cos())).acos();
+    let sector_angle2 = (position.y/(radius*stack_angle.cos())).asin();
+
+    print!("{sector_angle}, {sector_angle2}\n");
+
+    return (stack_angle, sector_angle);
+}
+
+
+fn stacks_and_sectors_to_sphere_position(stack: f32 /*pi/2 to -pi/2*/, sector: f32 /*0 to 2pi*/, radius: f32) -> Vec3{
+    let xy = radius * stack.cos();
+    let x = xy * sector.cos();
+    let y = xy * sector.sin();
+
+    let z = radius * stack.sin();
+
+    return Vec3::new(x, y, z);
+}
+
+fn from_screenspace(
     cursor_pos_screen: Vec2,
     camera: &Camera,
     camera_transform: &GlobalTransform,
