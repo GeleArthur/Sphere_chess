@@ -77,14 +77,14 @@ fn setup_scene(
         .insert(Wireframe)
         .insert(Name::new("Sphere"));
 
-    commands
-        .spawn_bundle(PbrBundle {
-            mesh: meshes.add(Mesh::from(shape::Plane { size: 50.0 })),
-            material: materials.add(Color::rgb(1.0, 0.0, 0.1).into()),
-            transform: Transform::from_xyz(0.0, -1.0, 0.0),
-            ..Default::default()
-        })
-        .insert(Name::new("Plane"));
+    // commands
+    //     .spawn_bundle(PbrBundle {
+    //         mesh: meshes.add(Mesh::from(shape::Plane { size: 50.0 })),
+    //         material: materials.add(Color::rgb(1.0, 0.0, 0.1).into()),
+    //         transform: Transform::from_xyz(0.0, -1.0, 0.0),
+    //         ..Default::default()
+    //     })
+    //     .insert(Name::new("Plane"));
 
     commands.spawn_bundle(PointLightBundle {
         point_light: PointLight {
@@ -216,15 +216,13 @@ fn raycast_ball(ray_cast: (Vec3, Vec3), sphere_position: Vec3, sphere_radius: f3
 
 // thanks tibor and ruben :D
 fn sphere_position_to_stacks_and_sectors(position: Vec3, radius: f32) -> (f32,f32){
-    let stack_angle = (position.z/radius).asin();
+    let phi = f32::atan2(position.y, position.x);
+    let theta = f32::asin(position.z);
+
+    print!("{phi}, {theta}\n");
 
 
-    let sector_angle = (position.x/(radius*stack_angle.cos())).acos();
-    let sector_angle2 = (position.y/(radius*stack_angle.cos())).asin();
-
-    print!("{sector_angle}, {sector_angle2}\n");
-
-    return (stack_angle, sector_angle);
+    return (theta, phi);
 }
 
 
