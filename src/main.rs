@@ -1,6 +1,8 @@
 mod util;
 mod camera;
 mod chess;
+mod piece;
+mod constant;
 
 use camera::*;
 use chess::*;

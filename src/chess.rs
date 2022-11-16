@@ -3,7 +3,9 @@ use bevy::prelude::*;
 use bevy::prelude::shape::UVSphere;
 
 use crate::*;
+use crate::constant::*;
 use crate::util::*;
+
 
 #[derive(Default)]
 struct SelectedSquare {
@@ -29,7 +31,7 @@ impl Plugin for ChessPlugin {
     fn build(&self, app: &mut App) {
         app
         .init_resource::<SelectedSquare>()
-        .add_startup_system(spawn_board)
+        .add_startup_system(spawn_board.label(BOARD_LABEL))
         .add_system(camera_sphere_select)
         ;
     }
@@ -41,7 +43,6 @@ fn spawn_board(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let radius = 1.0;
-
     commands
         .spawn()
         .insert(CenterSphere {
@@ -93,10 +94,7 @@ fn camera_sphere_select(
 
         let hit = ray_hit.unwrap();
 
-        let stack_sector = sphere_position_to_stacks_and_sectors(hit, sphere.radius);
-
-        let sector = stack_sector.1;
-        let stack = stack_sector.0;
+        let (stack,sector) = sphere_position_to_stacks_and_sectors(hit, sphere.radius);
 
         // lazy mode
         let around = util::map(sector, -std::f32::consts::PI, std::f32::consts::PI, 0.0, 1.0);
@@ -105,12 +103,13 @@ fn camera_sphere_select(
         selected.x = f32::floor(around * 8.0) as i8;
         selected.y = f32::floor(updown * 8.0) as i8;
 
-        let around = util::map(selected.x as f32, 0.0, 8.0, -std::f32::consts::PI, std::f32::consts::PI);
-        let updown = util::map(selected.y as f32, 0.0, 8.0, -std::f32::consts::PI/2.0, std::f32::consts::PI/2.0,);
+        // let around = util::map(selected.x as f32, 0.0, 8.0, -std::f32::consts::PI, std::f32::consts::PI);
+        // let updown = util::map(selected.y as f32, 0.0, 8.0, -std::f32::consts::PI/2.0, std::f32::consts::PI/2.0,);
 
-        let position_ss = stacks_and_sectors_to_sphere_position(updown, around, sphere.radius);
-        giz_transform.translation = position_ss;
+        // let position_ss = stacks_and_sectors_to_sphere_position(updown, around, sphere.radius);
+        // giz_transform.translation = position_ss;
 
-        println!("{},{}", selected.x, selected.y);
+        // println!("{},{}", selected.x, selected.y);
     }
 }
+
