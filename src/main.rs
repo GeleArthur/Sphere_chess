@@ -164,44 +164,18 @@ fn camera_sphere_select(
 
         let hit = ray_hit.unwrap();
 
-        let stack_sector = sphere_position_to_stacks_and_sectors(hit, sphere.radius);
+        let stack_sector = new_sphere_position_to_stacks_and_sectors(hit, sphere.radius);
 
-        let sector = std::f32::consts::PI + stack_sector.1;
+        let sector = stack_sector.1;
         let stack = stack_sector.0;
 
-        print!("{}\n", stack);
+        print!("{stack}, {sector}\n");
 
         // util::map(stack_sector.0, 0.0, stop1, start2, stop2)
 
-        let position_ss = stacks_and_sectors_to_sphere_position(stack, sector, sphere.radius);
+        let position_ss = new_stacks_and_sectors_to_sphere_position(stack, sector, sphere.radius);
 
         giz_transform.translation = position_ss;
-
-        //giz_transform.translation = to_sphere - Vec3::project_onto(to_sphere, raycasted.1);
-
-        //let v = to_sphere - Vec3::project_onto(to_sphere, raycasted.1);
-        // let v_squerd = v.dot(v);
-        // let r_squard = sphere.radius * sphere.radius;
-
-        // if v_squerd <= r_squard {
-        //     let collison_point =
-        //         sphere.center + v - (raycasted.1.normalize() * (f32::sqrt(r_squard - v_squerd)));
-
-        //     giz_transform.translation = collison_point;
-
-        //     let pitch = f32::atan2(collison_point.x, collison_point.z);
-        //     let yaw = collison_point.y;
-
-        //     let xy = yaw.cos();
-        //     let x = xy * pitch.cos();
-        //     let y = xy * pitch.sin();
-
-        //     let converted_pos = Vec3::new(x, yaw, y);
-
-        //     giz_transform.translation = converted_pos;
-
-        //     print!("pitch:{} yaw:{}\n", pitch, yaw);
-        // }
     }
 }
 
@@ -223,19 +197,36 @@ fn raycast_ball(ray_cast: (Vec3, Vec3), sphere_position: Vec3, sphere_radius: f3
 
 // thanks tibor and ruben :D
 fn sphere_position_to_stacks_and_sectors(position: Vec3, radius: f32) -> (f32,f32){
+    let phi = f32::atan2(position.y, position.x);
+    let theta = f32::asin(position.z);
+
+    return (theta, phi);
+}
+
+fn new_sphere_position_to_stacks_and_sectors(position: Vec3, radius: f32) -> (f32,f32){
     let phi = f32::atan2(position.z, position.x);
-    let theta = f32::asin(position.y / radius);
+    let theta = f32::asin(position.y);
 
     return (theta, phi);
 }
 
 
-fn stacks_and_sectors_to_sphere_position(stack: f32 /*pi/2 to -pi/2*/, sector: f32 /*0 to 2pi*/, radius: f32) -> Vec3{
-    let y = radius * stack.sin();
-    
+fn new_stacks_and_sectors_to_sphere_position(stack: f32 /*pi/2 to -pi/2*/, sector: f32 /*0 to 2pi*/, radius: f32) -> Vec3{
     let xz = radius * stack.cos();
     let x = xz * sector.cos();
-    let z = xz * stack.sin();
+    let z = xz * sector.sin();
+
+    let y = radius * stack.sin();
+
+    return Vec3::new(x, y, z);
+}
+
+fn stacks_and_sectors_to_sphere_position(stack: f32 /*pi/2 to -pi/2*/, sector: f32 /*0 to 2pi*/, radius: f32) -> Vec3{
+    let xy = radius * stack.cos();
+    let x = xy * sector.cos();
+    let y = xy * sector.sin();
+
+    let z = radius * stack.sin();
 
     return Vec3::new(x, y, z);
 }
