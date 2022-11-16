@@ -1,8 +1,15 @@
 use bevy::pbr::wireframe::Wireframe;
 use bevy::prelude::*;
+use bevy::prelude::shape::UVSphere;
 
 use crate::*;
 use crate::util::*;
+
+#[derive(Default)]
+struct SelectedSquare {
+    x: i8,
+    y: i8
+}
 
 #[derive(Reflect, Component, Default)]
 #[reflect(Component)]
@@ -16,12 +23,12 @@ struct CenterSphere {
 pub struct ChessBoard {
     pub grid: [[f32; 8]; 8],
 }
-
 pub struct ChessPlugin;
 
 impl Plugin for ChessPlugin {
     fn build(&self, app: &mut App) {
         app
+        .init_resource::<SelectedSquare>()
         .add_startup_system(spawn_board)
         .add_system(camera_sphere_select)
         ;
@@ -42,13 +49,13 @@ fn spawn_board(
             radius: radius,
         })
         .insert_bundle(PbrBundle {
-            mesh: meshes.add(Mesh::from(shape::UVSphere {
+            mesh: meshes.add(Mesh::from(UVSphere {
                 radius: radius,
                 sectors: 8,
                 stacks: 8,
                 ..Default::default()
             })),
-            material: materials.add(Color::rgba(0.0, 1.0, 0.0, 0.1).into()),
+            material: materials.add(Color::rgba(0.0, 1.0, 0.0, 1.0).into()),
             transform: Transform::from_xyz(0.0, 0.0, 0.0).with_rotation(Quat::from_euler(
                 EulerRot::XYZ,
                 std::f32::consts::PI / 2.0,
@@ -65,6 +72,7 @@ fn camera_sphere_select(
     camera: Query<(&Camera, &GlobalTransform)>,
     mut gizmos_cube: Query<&mut Transform, With<GizmosCube>>,
     sphere: Query<&CenterSphere>,
+    mut selected: ResMut<SelectedSquare>,
     windows: Res<Windows>,
 ) {
     let window = windows.get_primary().unwrap();
@@ -90,15 +98,19 @@ fn camera_sphere_select(
         let sector = stack_sector.1;
         let stack = stack_sector.0;
 
-        // print!("{stack}, {sector}\n");
-
-        let between = util::map(stack, -std::f32::consts::PI/2.0, std::f32::consts::PI/2.0, 0.0, 1.0);
+        // lazy mode
         let around = util::map(sector, -std::f32::consts::PI, std::f32::consts::PI, 0.0, 1.0);
+        let updown = util::map(stack, -std::f32::consts::PI/2.0, std::f32::consts::PI/2.0, 0.0, 1.0);
+        
+        selected.x = f32::floor(around * 8.0) as i8;
+        selected.y = f32::floor(updown * 8.0) as i8;
 
-        println!("{around}");
+        let around = util::map(selected.x as f32, 0.0, 8.0, -std::f32::consts::PI, std::f32::consts::PI);
+        let updown = util::map(selected.y as f32, 0.0, 8.0, -std::f32::consts::PI/2.0, std::f32::consts::PI/2.0,);
 
-        let position_ss = stacks_and_sectors_to_sphere_position(stack, sector, sphere.radius);
-
+        let position_ss = stacks_and_sectors_to_sphere_position(updown, around, sphere.radius);
         giz_transform.translation = position_ss;
+
+        println!("{},{}", selected.x, selected.y);
     }
 }
