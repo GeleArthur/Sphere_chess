@@ -3,9 +3,11 @@ mod camera;
 mod chess;
 mod piece;
 mod constant;
+mod game_assets;
 
 use camera::*;
 use chess::*;
+use piece::*;
 
 use bevy::{
     input::mouse::MouseMotion,
@@ -15,7 +17,6 @@ use bevy::{
 };
 use bevy_inspector_egui::WorldInspectorPlugin;
 
-
 #[derive(Reflect, Component, Default)]
 #[reflect(Component)]
 struct GizmosCube;
@@ -24,9 +25,11 @@ fn main() {
     App::new()
         .add_plugins(DefaultPlugins)
         .add_plugin(WorldInspectorPlugin::new())
+        .add_startup_system_to_stage(StartupStage::PreStartup, game_assets::asset_loading)
         .add_plugin(WireframePlugin)
         .add_plugin(CameraPlugin)
         .add_plugin(ChessPlugin)
+        .add_plugin(PiecePlugin)
         .add_startup_system(setup_scene)
         .run();
 }

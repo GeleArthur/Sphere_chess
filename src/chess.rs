@@ -15,15 +15,14 @@ struct SelectedSquare {
 
 #[derive(Reflect, Component, Default)]
 #[reflect(Component)]
-struct CenterSphere {
-    center: Vec3,
-    radius: f32,
+pub struct CenterSphere {
+    pub center: Vec3,
+    pub radius: f32,
 }
 
-#[derive(Reflect, Component, Default)]
-#[reflect(Component)]
+#[derive(Component, Default)]
 pub struct ChessBoard {
-    pub grid: [[f32; 8]; 8],
+    pub grid: [[Option<Piece>; 8]; 8],
 }
 pub struct ChessPlugin;
 
@@ -103,11 +102,11 @@ fn camera_sphere_select(
         selected.x = f32::floor(around * 8.0) as i8;
         selected.y = f32::floor(updown * 8.0) as i8;
 
-        // let around = util::map(selected.x as f32, 0.0, 8.0, -std::f32::consts::PI, std::f32::consts::PI);
-        // let updown = util::map(selected.y as f32, 0.0, 8.0, -std::f32::consts::PI/2.0, std::f32::consts::PI/2.0,);
+        let around = util::map(selected.x as f32, 0.0, 8.0, -std::f32::consts::PI, std::f32::consts::PI);
+        let updown = util::map(selected.y as f32, 0.0, 8.0, -std::f32::consts::PI/2.0, std::f32::consts::PI/2.0,);
 
-        // let position_ss = stacks_and_sectors_to_sphere_position(updown, around, sphere.radius);
-        // giz_transform.translation = position_ss;
+        let position_ss = stacks_and_sectors_to_sphere_position(updown, around, sphere.radius);
+        giz_transform.translation = position_ss;
 
         // println!("{},{}", selected.x, selected.y);
     }
