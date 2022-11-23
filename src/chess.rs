@@ -1,6 +1,7 @@
 use bevy::pbr::wireframe::Wireframe;
 use bevy::prelude::*;
 use bevy::prelude::shape::UVSphere;
+use bevy::render::render_resource::Texture;
 
 use crate::*;
 use crate::constant::*;
@@ -40,19 +41,27 @@ fn spawn_board(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
+    assets: Res<AssetServer>
 ) {
-    let radius = 1.0;
+
+    let texture_handle: Handle<Image> = assets.load("uv.jpg");
+
+
+    let board_mat = materials.add(StandardMaterial { 
+        base_color_texture: texture_handle.clone(), 
+        ..Default::default() });
+
     commands
         .spawn()
         .insert(CenterSphere {
             center: Vec3::new(0.0, 0.0, 0.0),
-            radius: radius,
+            radius: 1.0,
         })
         .insert_bundle(PbrBundle {
             mesh: meshes.add(Mesh::from(UVSphere {
-                radius: radius,
-                sectors: 8,
-                stacks: 8,
+                radius: 1.0,
+                sectors: 8*4,
+                stacks: 8*4,
                 ..Default::default()
             })),
             material: materials.add(Color::rgba(0.0, 1.0, 0.0, 1.0).into()),
@@ -64,7 +73,7 @@ fn spawn_board(
             )),
             ..Default::default()
         })
-        .insert(Wireframe)
+        // .insert(Wireframe)
         .insert(Name::new("Sphere"));
 }
 

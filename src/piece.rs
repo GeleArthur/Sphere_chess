@@ -28,7 +28,7 @@ impl std::default::Default for PieceTypes {
 }
 
 #[derive(Component)]
-pub struct oritionCheck;
+pub struct OriginCheck;
 
 pub struct PiecePlugin;
 impl Plugin for PiecePlugin {
@@ -43,7 +43,6 @@ impl Plugin for PiecePlugin {
 fn spawn_pieces(
     mut commands: Commands,
     assets: Res<GameAssets>,
-    mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     for m in 0..8 {
@@ -57,26 +56,14 @@ fn spawn_pieces(
                 })
                 .insert(Piece { x: n, y: m })
                 .insert(Name::new(format!("Piece X:{n} Y: {m}")));
-
-            commands
-                .spawn_bundle(PbrBundle {
-                    mesh: meshes.add(Mesh::from(UVSphere {
-                        ..Default::default()
-                    })),
-                    material: materials.add(Color::rgba(1.0, 1.0, 1.0, 1.0).into()),
-                    transform: Transform::from_scale(Vec3::ONE * 0.1),
-                    ..Default::default()
-                })
-                .insert(oritionCheck);
         }
     }
 }
 
 fn piece_posistion(
     mut _commands: Commands,
-    mut pieces: Query<(&mut Transform, &Piece), Without<oritionCheck>>,
+    mut pieces: Query<(&mut Transform, &Piece), Without<OriginCheck>>,
     sphere: Query<&CenterSphere>,
-    mut orition: Query<&mut Transform, With<oritionCheck>>,
 ) {
     for (mut transform, piece) in &mut pieces {
         let around = map(piece.x as f32, 0.0, 8.0, -PI, PI) + PI / 8.0;
@@ -89,23 +76,4 @@ fn piece_posistion(
         transform.look_at(position_ss * 2.0, Vec3::Y);
         transform.rotation *= Quat::from_euler(EulerRot::XYZ, -PI / 2.0, 0.0, 0.0);
     }
-
-    // let mut iter = orition.iter_mut();
-
-    // for mut trans in &mut orition {
-    //     trans.translation = Vec3::ONE;
-    // }
-
-    for (mut ori, piece) in orition.iter_mut().zip(pieces.iter()) {
-        ori.translation = piece.0.translation;
-    }
 }
-
-// thread 'main' panicked at 'error[B0001]: 
-// Query<&mut bevy_transform::components::transform::Transform, bevy_ecs::query::filter::With<sphere_chess::piece::oritionCheck>> 
-// in system sphere_chess::piece::piece_posistion 
-// accesses component(s) 
-// bevy_transform::components::transform::Transform in 
-// a way that conflicts with a previous system parameter. 
-// Consider using `Without<T>` to create disjoint Queries or merging conflicting Queries into a `ParamSet`.', C:\Users\Arthur\.cargo\registry\src\github.com-1ecc6299db9ec823\bevy_ecs-0.8.1\src\system\system_param.rs:205:5
-
