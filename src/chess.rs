@@ -44,12 +44,12 @@ fn spawn_board(
     assets: Res<AssetServer>
 ) {
 
-    let texture_handle: Handle<Image> = assets.load("uv.jpg");
-
+    let texture_handle: Handle<Image> = assets.load("board.png");
 
     let board_mat = materials.add(StandardMaterial { 
-        base_color_texture: texture_handle.clone(), 
-        ..Default::default() });
+        base_color_texture: Some(texture_handle.clone()), 
+        ..Default::default() }
+    );
 
     commands
         .spawn()
@@ -64,10 +64,10 @@ fn spawn_board(
                 stacks: 8*4,
                 ..Default::default()
             })),
-            material: materials.add(Color::rgba(0.0, 1.0, 0.0, 1.0).into()),
+            material: board_mat,
             transform: Transform::from_xyz(0.0, 0.0, 0.0).with_rotation(Quat::from_euler(
                 EulerRot::XYZ,
-                std::f32::consts::PI / 2.0,
+                -std::f32::consts::PI / 2.0,
                 0.0,
                 0.0,
             )),
