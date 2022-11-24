@@ -1,13 +1,13 @@
 mod util;
 mod camera;
 mod chess;
-mod piece;
+mod pieces;
 mod constant;
 mod game_assets;
 
 use camera::*;
 use chess::*;
-use piece::*;
+use pieces::*;
 
 use bevy::{
     input::mouse::MouseMotion,

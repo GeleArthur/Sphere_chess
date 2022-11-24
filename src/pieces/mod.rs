@@ -1,42 +1,22 @@
-use std::f32::consts::PI;
+mod types;
+mod color;
+mod position;
 
-use bevy::prelude::{shape::UVSphere, *};
+use crate::pieces::types::*;
+use crate::pieces::position::*;
+use std::f32::consts::PI;
+use bevy::prelude::*;
 
 use crate::{chess::CenterSphere, game_assets::GameAssets, util::*};
-
-#[derive(Component, Reflect, Clone)]
-pub enum PieceTypes {
-    Pawn,
-    Bishop,
-    Knight,
-    Rook,
-    Queen,
-    King,
-}
-
-#[derive(Component, Default, Reflect)]
-#[reflect(Component)]
-pub struct Piece {
-    x: i8,
-    y: i8,
-}
-
-impl std::default::Default for PieceTypes {
-    fn default() -> Self {
-        PieceTypes::Pawn
-    }
-}
-
-#[derive(Component)]
-pub struct OriginCheck;
 
 pub struct PiecePlugin;
 impl Plugin for PiecePlugin {
     fn build(&self, app: &mut App) {
-        app.register_type::<Piece>()
-            .register_type::<PieceTypes>()
-            .add_startup_system(spawn_pieces)
-            .add_system(piece_posistion);
+        app
+        .register_type::<PiecePosition>()
+        .register_type::<PieceTypes>()
+        .add_startup_system(spawn_pieces)
+        .add_system(piece_posistion);
     }
 }
 
@@ -52,17 +32,24 @@ fn spawn_pieces(
                 .insert_bundle(PbrBundle {
                     mesh: assets.pawn.clone(),
                     material: materials.add(Color::rgba(1.0, 1.0, 1.0, 1.0).into()),
+
                     ..Default::default()
                 })
-                .insert(Piece { x: n, y: m })
+                .insert(PiecePosition { x: n, y: m })
                 .insert(Name::new(format!("Piece X:{n} Y: {m}")));
         }
     }
 }
 
+
+fn spawn_piece(x: i8, y:i8, ){
+
+}
+
+
 fn piece_posistion(
     mut _commands: Commands,
-    mut pieces: Query<(&mut Transform, &Piece), Without<OriginCheck>>,
+    mut pieces: Query<(&mut Transform, &PiecePosition)>,
     sphere: Query<&CenterSphere>,
 ) {
     for (mut transform, piece) in &mut pieces {

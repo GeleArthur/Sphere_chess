@@ -1,10 +1,10 @@
 use bevy::pbr::wireframe::Wireframe;
 use bevy::prelude::*;
 use bevy::prelude::shape::UVSphere;
-use bevy::render::render_resource::Texture;
 
 use crate::*;
 use crate::constant::*;
+use crate::game_assets::GameAssets;
 use crate::util::*;
 
 
@@ -23,7 +23,7 @@ pub struct CenterSphere {
 
 #[derive(Component, Default)]
 pub struct ChessBoard {
-    pub grid: [[Option<Piece>; 8]; 8],
+    pub grid: [[Option<Entity>; 8]; 8],
 }
 pub struct ChessPlugin;
 
@@ -39,17 +39,18 @@ impl Plugin for ChessPlugin {
 
 fn spawn_board(
     mut commands: Commands,
+
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-    assets: Res<AssetServer>
+    // mut materials: ResMut<Assets<StandardMaterial>>,
+    assets: Res<GameAssets>
 ) {
 
-    let texture_handle: Handle<Image> = assets.load("board.png");
+    // let texture_handle: Handle<Image> = assets.load("board.png");
 
-    let board_mat = materials.add(StandardMaterial { 
-        base_color_texture: Some(texture_handle.clone()), 
-        ..Default::default() }
-    );
+    // let board_mat = materials.add(StandardMaterial { 
+    //     base_color_texture: Some(texture_handle.clone()), 
+    //     ..Default::default() }
+    // );
 
     commands
         .spawn()
@@ -64,7 +65,7 @@ fn spawn_board(
                 stacks: 8*4,
                 ..Default::default()
             })),
-            material: board_mat,
+            material: assets.board_material.clone(),
             transform: Transform::from_xyz(0.0, 0.0, 0.0).with_rotation(Quat::from_euler(
                 EulerRot::XYZ,
                 -std::f32::consts::PI / 2.0,
