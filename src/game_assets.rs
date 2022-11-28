@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+#[derive(Resource)]
 pub struct GameAssets {
     pub pawn: Handle<Mesh>,
     pub bishop: Handle<Mesh>,

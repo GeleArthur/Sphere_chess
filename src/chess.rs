@@ -1,4 +1,3 @@
-use bevy::pbr::wireframe::Wireframe;
 use bevy::prelude::*;
 use bevy::prelude::shape::UVSphere;
 
@@ -8,7 +7,7 @@ use crate::game_assets::GameAssets;
 use crate::util::*;
 
 
-#[derive(Default)]
+#[derive(Default, Resource)]
 struct SelectedSquare {
     x: i8,
     y: i8
@@ -53,12 +52,11 @@ fn spawn_board(
     // );
 
     commands
-        .spawn()
-        .insert(CenterSphere {
+        .spawn(CenterSphere {
             center: Vec3::new(0.0, 0.0, 0.0),
             radius: 1.0,
         })
-        .insert_bundle(PbrBundle {
+        .insert(PbrBundle {
             mesh: meshes.add(Mesh::from(UVSphere {
                 radius: 1.0,
                 sectors: 8*4,
@@ -88,9 +86,9 @@ fn camera_sphere_select(
     let window = windows.get_primary().unwrap();
 
     if let Some(mouse_position) = window.cursor_position() {
-        let camera_pos = camera.single();
+        let (camera, camera_transform) = camera.single();
 
-        let raycasted = from_screenspace(mouse_position, camera_pos.0, camera_pos.1).unwrap();
+        let raycasted = camera.viewport_to_world(camera_transform, mouse_position).unwrap();
         let mut giz_transform = gizmos_cube.single_mut();
 
         let sphere = sphere.single();

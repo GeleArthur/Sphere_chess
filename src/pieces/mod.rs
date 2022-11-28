@@ -68,7 +68,8 @@ fn spawn_piece(position: PiecePosition, piece_type: PieceTypes, color: PieceColo
         PieceColor::Black => assets.black_material.clone(),
     };
 
-    commands.spawn().insert_bundle(PbrBundle{
+
+    commands.spawn(PbrBundle{
         mesh,
         material,
         ..Default::default()

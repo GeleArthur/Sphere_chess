@@ -23,7 +23,13 @@ struct GizmosCube;
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(WindowPlugin{
+            window: WindowDescriptor{
+                title: "Sphere chess".to_owned(),
+                ..default()
+            },
+            ..default()
+        }))
         .add_plugin(WorldInspectorPlugin::new())
         .add_startup_system_to_stage(StartupStage::PreStartup, game_assets::asset_loading)
         .add_plugin(WireframePlugin)
@@ -39,16 +45,7 @@ fn setup_scene(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    // commands
-    //     .spawn_bundle(PbrBundle {
-    //         mesh: meshes.add(Mesh::from(shape::Plane { size: 50.0 })),
-    //         material: materials.add(Color::rgb(1.0, 0.0, 0.1).into()),
-    //         transform: Transform::from_xyz(0.0, -1.0, 0.0),
-    //         ..Default::default()
-    //     })
-    //     .insert(Name::new("Plane"));
-
-    commands.spawn_bundle(PointLightBundle {
+    commands.spawn(PointLightBundle {
         point_light: PointLight {
             intensity: 1500.0,
             shadows_enabled: true,
@@ -59,7 +56,7 @@ fn setup_scene(
     });
 
     commands
-        .spawn_bundle(PbrBundle {
+        .spawn(PbrBundle {
             mesh: meshes.add(Mesh::from(shape::UVSphere {
                 radius: 0.1,
                 ..Default::default()
