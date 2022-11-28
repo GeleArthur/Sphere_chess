@@ -9,6 +9,8 @@ use bevy::prelude::*;
 
 use crate::{chess::CenterSphere, game_assets::GameAssets, util::*};
 
+use self::color::PieceColor;
+
 pub struct PiecePlugin;
 impl Plugin for PiecePlugin {
     fn build(&self, app: &mut App) {
@@ -23,28 +25,59 @@ impl Plugin for PiecePlugin {
 fn spawn_pieces(
     mut commands: Commands,
     assets: Res<GameAssets>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
-    for m in 0..8 {
-        for n in 0..8 {
-            commands
-                .spawn()
-                .insert_bundle(PbrBundle {
-                    mesh: assets.pawn.clone(),
-                    material: materials.add(Color::rgba(1.0, 1.0, 1.0, 1.0).into()),
-
-                    ..Default::default()
-                })
-                .insert(PiecePosition { x: n, y: m })
-                .insert(Name::new(format!("Piece X:{n} Y: {m}")));
-        }
+    for x in 0..8 {
+        spawn_piece(PiecePosition {x:x,y:6}, PieceTypes::Pawn, PieceColor::Black, &mut commands, &assets)
     }
+
+    spawn_piece(PiecePosition {x:0,y:7}, PieceTypes::King, PieceColor::Black, &mut commands, &assets);
+    spawn_piece(PiecePosition {x:1,y:7}, PieceTypes::Queen, PieceColor::Black, &mut commands, &assets);
+    spawn_piece(PiecePosition {x:2,y:7}, PieceTypes::Bishop, PieceColor::Black, &mut commands, &assets);
+    spawn_piece(PiecePosition {x:3,y:7}, PieceTypes::Knight, PieceColor::Black, &mut commands, &assets);
+    spawn_piece(PiecePosition {x:4,y:7}, PieceTypes::Rook, PieceColor::Black, &mut commands, &assets);
+    spawn_piece(PiecePosition {x:5,y:7}, PieceTypes::Rook, PieceColor::Black, &mut commands, &assets);
+    spawn_piece(PiecePosition {x:6,y:7}, PieceTypes::Knight, PieceColor::Black, &mut commands, &assets);
+    spawn_piece(PiecePosition {x:7,y:7}, PieceTypes::Bishop, PieceColor::Black, &mut commands, &assets);
+
+    for x in 0..8 {
+        spawn_piece(PiecePosition {x:x,y:1}, PieceTypes::Pawn, PieceColor::White, &mut commands, &assets)
+    }
+
+    spawn_piece(PiecePosition {x:0,y:0}, PieceTypes::King, PieceColor::White, &mut commands, &assets);
+    spawn_piece(PiecePosition {x:1,y:0}, PieceTypes::Queen, PieceColor::White, &mut commands, &assets);
+    spawn_piece(PiecePosition {x:2,y:0}, PieceTypes::Bishop, PieceColor::White, &mut commands, &assets);
+    spawn_piece(PiecePosition {x:3,y:0}, PieceTypes::Knight, PieceColor::White, &mut commands, &assets);
+    spawn_piece(PiecePosition {x:4,y:0}, PieceTypes::Rook, PieceColor::White, &mut commands, &assets);
+    spawn_piece(PiecePosition {x:5,y:0}, PieceTypes::Rook, PieceColor::White, &mut commands, &assets);
+    spawn_piece(PiecePosition {x:6,y:0}, PieceTypes::Knight, PieceColor::White, &mut commands, &assets);
+    spawn_piece(PiecePosition {x:7,y:0}, PieceTypes::Bishop, PieceColor::White, &mut commands, &assets);
 }
 
+fn spawn_piece(position: PiecePosition, piece_type: PieceTypes, color: PieceColor, commands: &mut Commands, assets: &Res<GameAssets>){
+    let mesh = match piece_type {
+        PieceTypes::Pawn => assets.pawn.clone(),
+        PieceTypes::Bishop => assets.bishop.clone(),
+        PieceTypes::Knight => assets.knight.clone(),
+        PieceTypes::Rook => assets.rook.clone(),
+        PieceTypes::Queen => assets.queen.clone(),
+        PieceTypes::King => assets.king.clone(),
+    };
 
-fn spawn_piece(x: i8, y:i8, ){
+    let material = match color {
+        PieceColor::White => assets.white_material.clone(),
+        PieceColor::Black => assets.black_material.clone(),
+    };
 
+    commands.spawn().insert_bundle(PbrBundle{
+        mesh,
+        material,
+        ..Default::default()
+    })
+    .insert(piece_type)
+    .insert(color)
+    .insert(position);
 }
+
 
 
 fn piece_posistion(
