@@ -56,7 +56,7 @@ fn spawn_board(
             center: Vec3::new(0.0, 0.0, 0.0),
             radius: 1.0,
         })
-        .insert(PbrBundle {
+        .insert(MaterialMeshBundle {
             mesh: meshes.add(Mesh::from(UVSphere {
                 radius: 1.0,
                 sectors: 8*4,

@@ -1,20 +1,17 @@
-mod util;
 mod camera;
 mod chess;
-mod pieces;
 mod constant;
 mod game_assets;
+mod pieces;
+mod util;
+mod custom_material;
 
 use camera::*;
 use chess::*;
+use custom_material::CustomMaterial;
 use pieces::*;
 
-use bevy::{
-    input::mouse::MouseMotion,
-    math::*,
-    pbr::wireframe::{WireframePlugin},
-    prelude::*,
-};
+use bevy::{input::mouse::MouseMotion, math::*, pbr::wireframe::WireframePlugin, prelude::*, log::LogPlugin};
 use bevy_inspector_egui::WorldInspectorPlugin;
 
 #[derive(Reflect, Component, Default)]
@@ -23,19 +20,27 @@ struct GizmosCube;
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins.set(WindowPlugin{
-            window: WindowDescriptor{
-                title: "Sphere chess".to_owned(),
-                ..default()
-            },
-            ..default()
-        }))
+        .add_plugins(
+            DefaultPlugins
+                .set(WindowPlugin {
+                    window: WindowDescriptor {
+                        title: "Sphere chess".to_owned(),
+                        ..default()
+                    },
+                    ..default()
+                })
+                .set(LogPlugin {
+                    filter: "wgpu=error,bevy_ecs::event=error".to_string(),
+                    ..default()
+                }),
+        )
         .add_plugin(WorldInspectorPlugin::new())
         .add_startup_system_to_stage(StartupStage::PreStartup, game_assets::asset_loading)
         .add_plugin(WireframePlugin)
         .add_plugin(CameraPlugin)
         .add_plugin(ChessPlugin)
         .add_plugin(PiecePlugin)
+        .add_plugin(MaterialPlugin::<CustomMaterial>::default())
         .add_startup_system(setup_scene)
         .run();
 }

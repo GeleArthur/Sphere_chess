@@ -14,7 +14,8 @@ impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
         app.register_type::<CameraRotation>()
             .add_startup_system(spawn_camera)
-            .add_system(camera_rotation);
+            .add_system(camera_rotation)
+            .add_system(light_to_camera);
     }
 }
 
@@ -33,10 +34,10 @@ fn camera_rotation(
     mut motion_evr: EventReader<MouseMotion>,
     buttons: Res<Input<MouseButton>>,
 ) {
-    if buttons.pressed(MouseButton::Left) == false {
+    if motion_evr.len() == 0 {
         return;
     }
-    if motion_evr.len() == 0 {
+    if buttons.pressed(MouseButton::Left) == false {
         return;
     }
 
@@ -54,4 +55,11 @@ fn camera_rotation(
         let forward = camera.forward();
         camera.translation = -forward * 5.0;
     }
+}
+
+fn light_to_camera(
+    camera: Query<&Transform, (With<Camera>, Without<PointLight>)>,
+    mut light: Query<&mut Transform, (With<PointLight>, Without<Camera>)>,
+) {
+    light.single_mut().translation = camera.single().translation;
 }
