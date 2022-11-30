@@ -38,9 +38,7 @@ impl Plugin for ChessPlugin {
 
 fn spawn_board(
     mut commands: Commands,
-
     mut meshes: ResMut<Assets<Mesh>>,
-    // mut materials: ResMut<Assets<StandardMaterial>>,
     assets: Res<GameAssets>
 ) {
 
@@ -72,7 +70,6 @@ fn spawn_board(
             )),
             ..Default::default()
         })
-        // .insert(Wireframe)
         .insert(Name::new("Sphere"));
 }
 

@@ -35,7 +35,7 @@ pub fn asset_loading(
         white_material: materials.add(Color::rgba(1.0, 1.0, 1.0, 1.0).into()),
 
         board_material: materials_custom.add(CustomMaterial {
-            color: Color::BLUE,
+            color: Color::RED,
             color_texture: Some(assets.load("board.png")),
             alpha_mode: AlphaMode::Blend,
         }),

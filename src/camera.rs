@@ -7,7 +7,6 @@ pub struct CameraRotation {
     pub x: f32,
     pub y: f32,
 }
-
 pub struct CameraPlugin;
 
 impl Plugin for CameraPlugin {

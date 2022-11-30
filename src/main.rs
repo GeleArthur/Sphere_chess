@@ -32,6 +32,10 @@ fn main() {
                 .set(LogPlugin {
                     filter: "wgpu=error,bevy_ecs::event=error".to_string(),
                     ..default()
+                })
+                .set(AssetPlugin{
+                    watch_for_changes: true,
+                    ..default()
                 }),
         )
         .add_plugin(WorldInspectorPlugin::new())
