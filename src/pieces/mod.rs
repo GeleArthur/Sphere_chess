@@ -69,7 +69,7 @@ fn spawn_piece(position: PiecePosition, piece_type: PieceTypes, color: PieceColo
     };
 
 
-    commands.spawn(PbrBundle{
+    commands.spawn(MaterialMeshBundle{
         mesh,
         material,
         ..Default::default()

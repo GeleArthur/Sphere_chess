@@ -5,27 +5,18 @@ use bevy::{
     render::render_resource::{AsBindGroup, ShaderRef}, asset::AssetPath,
 };
 
-impl Material for CustomMaterial {
+impl Material for ChessSphereMaterial {
     fn fragment_shader() -> ShaderRef {
-        ShaderRef::Path(AssetPath::from("custom_material.wgsl"))
-    }
-
-    // fn vertex_shader() -> ShaderRef {
-    //     "shaders/custom_material.wgsl".into()
-    // }
-
-    fn alpha_mode(&self) -> AlphaMode {
-        self.alpha_mode
+        ShaderRef::Path(AssetPath::from("chess_sphere.wgsl"))
     }
 }
 
 #[derive(AsBindGroup, TypeUuid, Debug, Clone)]
 #[uuid = "b7b0f6e5-5ab9-4191-8317-cb91af729ceb"]
-pub struct CustomMaterial {
+pub struct ChessSphereMaterial {
     #[uniform(0)]
     pub color: Color,
     #[texture(1)]
     #[sampler(2)]
     pub color_texture: Option<Handle<Image>>,
-    pub alpha_mode: AlphaMode,
 }

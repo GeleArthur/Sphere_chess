@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use crate::custom_material::CustomMaterial;
+use crate::custom_material::ChessSphereMaterial;
 
 #[derive(Resource)]
 pub struct GameAssets {
@@ -11,17 +11,16 @@ pub struct GameAssets {
     pub queen: Handle<Mesh>,
     pub king: Handle<Mesh>,
 
-    pub white_material: Handle<StandardMaterial>,
-    pub black_material: Handle<StandardMaterial>,
+    pub white_material: Handle<ChessSphereMaterial>,
+    pub black_material: Handle<ChessSphereMaterial>,
 
-    pub board_material: Handle<CustomMaterial>,
+    pub board_material: Handle<ChessSphereMaterial>,
 }
 
 pub fn asset_loading(
     mut commands: Commands,
     assets: Res<AssetServer>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-    mut materials_custom: ResMut<Assets<CustomMaterial>>,
+    mut materials_custom: ResMut<Assets<ChessSphereMaterial>>
 ) {
     commands.insert_resource(GameAssets {
         pawn: assets.load("pieces.glb#Mesh1/Primitive0"),
@@ -31,13 +30,19 @@ pub fn asset_loading(
         queen: assets.load("pieces.glb#Mesh5/Primitive0"),
         king: assets.load("pieces.glb#Mesh0/Primitive0"),
 
-        black_material: materials.add(Color::rgba(0.0, 0.0, 0.0, 1.0).into()),
-        white_material: materials.add(Color::rgba(1.0, 1.0, 1.0, 1.0).into()),
+        black_material: materials_custom.add(ChessSphereMaterial {
+            color: Color::rgb(0.1,0.1,0.1),
+            color_texture: Some(assets.load("white.png")),
+        }),
 
-        board_material: materials_custom.add(CustomMaterial {
-            color: Color::RED,
+        white_material: materials_custom.add(ChessSphereMaterial {
+            color: Color::WHITE,
+            color_texture: Some(assets.load("white.png")),
+        }),
+
+        board_material: materials_custom.add(ChessSphereMaterial {
+            color: Color::WHITE,
             color_texture: Some(assets.load("board.png")),
-            alpha_mode: AlphaMode::Blend,
         }),
     })
 }
