@@ -4,11 +4,11 @@ mod constant;
 mod game_assets;
 mod pieces;
 mod util;
-mod custom_material;
+mod sphere_material;
 
 use camera::*;
 use chess::*;
-use custom_material::ChessSphereMaterial;
+use sphere_material::ChessSphereMaterial;
 use pieces::*;
 
 use bevy::{
@@ -44,6 +44,7 @@ fn main() {
         .add_plugin(ChessPlugin)
         .add_plugin(PiecePlugin)
         .add_plugin(MaterialPlugin::<ChessSphereMaterial>::default())
+        .add_plugin(MaterialPlugin::<PiecesMaterial>::default())
         .add_startup_system(setup_scene)
         .run();
 }

@@ -1,14 +1,15 @@
 mod types;
 mod color;
 mod position;
+mod material;
 
 use crate::pieces::types::*;
 use crate::pieces::position::*;
+pub use crate::pieces::material::*;
 use std::f32::consts::PI;
 use bevy::prelude::*;
 
 use crate::{chess::CenterSphere, game_assets::GameAssets, util::*};
-
 use self::color::PieceColor;
 
 pub struct PiecePlugin;
