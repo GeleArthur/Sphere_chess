@@ -1,3 +1,6 @@
+
+// https://www.roxlu.com/2014/037/opengl-rim-shader
+// https://www.youtube.com/watch?v=pWYt348Ki5g
 mod camera;
 mod chess;
 mod constant;

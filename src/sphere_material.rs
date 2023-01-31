@@ -7,7 +7,7 @@ use bevy::{
 
 impl Material for ChessSphereMaterial {
     fn fragment_shader() -> ShaderRef {
-        ShaderRef::Path(AssetPath::from("chess_sphere.wgsl"))
+        ShaderRef::Path(AssetPath::from("pieces.wgsl"))
     }
 }
 
