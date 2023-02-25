@@ -13,6 +13,7 @@ use camera::*;
 use chess::*;
 use sphere_material::ChessSphereMaterial;
 use pieces::*;
+// use defualtPluginsChange::CustomDefaultPlugins;
 
 use bevy::{
     input::mouse::MouseMotion,
@@ -20,7 +21,7 @@ use bevy::{
     pbr::wireframe::WireframePlugin,
     prelude::*,
 };
-use bevy_inspector_egui::WorldInspectorPlugin;
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 #[derive(Reflect, Component, Default)]
 #[reflect(Component)]
@@ -40,7 +41,7 @@ fn main() {
                 ..default()
             })
         )
-        .add_plugin(WorldInspectorPlugin::new())
+        .add_plugin(WorldInspectorPlugin)
         .add_startup_system_to_stage(StartupStage::PreStartup, game_assets::asset_loading)
         .add_plugin(WireframePlugin)
         .add_plugin(CameraPlugin)

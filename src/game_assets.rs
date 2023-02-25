@@ -32,12 +32,15 @@ pub fn asset_loading(
         king: assets.load("pieces.glb#Mesh0/Primitive0"),
 
         black_material: pieces_materials.add(PiecesMaterial {
-            color: Color::rgb(0.1,0.1,0.1),
+            base_color: Color::BLACK,
+            base_color_outline: Color::WHITE,
             color_texture: Some(assets.load("white.png")),
         }),
 
         white_material: pieces_materials.add(PiecesMaterial {
-            color: Color::WHITE,
+            base_color: Color::WHITE,
+            base_color_outline: Color::BLACK,
+            
             color_texture: Some(assets.load("white.png")),
         }),
 

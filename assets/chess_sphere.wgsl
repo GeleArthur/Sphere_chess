@@ -1,5 +1,6 @@
 #import bevy_pbr::mesh_view_bindings
 #import bevy_pbr::mesh_bindings
+#define_import_path bevy_pbr::pbr_functions
 
 #import bevy_pbr::utils
 #import bevy_pbr::clustered_forward
@@ -25,6 +26,9 @@ struct FragmentInput {
 
 @fragment
 fn fragment(in: FragmentInput) -> @location(0) vec4<f32> {
-    var lights = dot(in.world_normal.xyz, vec3<f32>(1.0,1.0,0.0));
-    return vec4(lights * textureSample(base_color_texture, base_color_sampler, in.uv).rgb, 1.0);
+    var lights = max(dot(in.world_normal.xyz, vec3<f32>(1.0,1.0,0.0)),0.0);
+    // lights += max(dot(in.world_normal.xyz, vec3<f32>(-1.0,-1.0,0.0)),0.0) * 0.01;
+
+
+    return vec4(textureSample(base_color_texture, base_color_sampler, in.uv).rgb, 1.0);
 }
