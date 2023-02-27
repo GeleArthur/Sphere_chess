@@ -1,11 +1,10 @@
 #import bevy_pbr::mesh_view_bindings
 #import bevy_pbr::mesh_bindings
-#define_import_path bevy_pbr::pbr_functions
 
 #import bevy_pbr::utils
-#import bevy_pbr::clustered_forward
-#import bevy_pbr::lighting
-#import bevy_pbr::shadows
+// #import bevy_pbr::clustered_forward
+// #import bevy_pbr::lighting
+// #import bevy_pbr::shadows
 
 struct CustomMaterial {
     color: vec4<f32>,

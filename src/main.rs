@@ -13,13 +13,11 @@ use camera::*;
 use chess::*;
 use sphere_material::ChessSphereMaterial;
 use pieces::*;
-// use defualtPluginsChange::CustomDefaultPlugins;
 
 use bevy::{
     input::mouse::MouseMotion,
     math::*,
-    pbr::wireframe::WireframePlugin,
-    prelude::*,
+    prelude::*, diagnostic::{LogDiagnosticsPlugin, FrameTimeDiagnosticsPlugin}, window::PresentMode,
 };
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
@@ -33,6 +31,7 @@ fn main() {
             DefaultPlugins.set(WindowPlugin {
                 window: WindowDescriptor {
                     title: "Sphere chess".to_owned(),
+                    present_mode: PresentMode::AutoNoVsync,
                     ..default()
                 },
                 ..default()
@@ -41,9 +40,10 @@ fn main() {
                 ..default()
             })
         )
+        .add_plugin(LogDiagnosticsPlugin::default())
+        .add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_plugin(WorldInspectorPlugin)
         .add_startup_system_to_stage(StartupStage::PreStartup, game_assets::asset_loading)
-        .add_plugin(WireframePlugin)
         .add_plugin(CameraPlugin)
         .add_plugin(ChessPlugin)
         .add_plugin(PiecePlugin)

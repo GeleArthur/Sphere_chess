@@ -8,10 +8,13 @@ use crate::util::*;
 
 
 #[derive(Default, Resource)]
-struct SelectedSquare {
-    x: i8,
-    y: i8
+pub struct SelectedSquare {
+    pub x: i8,
+    pub y: i8
 }
+
+#[derive(Component)]
+pub struct SelectedPiece;
 
 #[derive(Reflect, Component, Default)]
 #[reflect(Component)]
@@ -41,14 +44,6 @@ fn spawn_board(
     mut meshes: ResMut<Assets<Mesh>>,
     assets: Res<GameAssets>
 ) {
-
-    // let texture_handle: Handle<Image> = assets.load("board.png");
-
-    // let board_mat = materials.add(StandardMaterial { 
-    //     base_color_texture: Some(texture_handle.clone()), 
-    //     ..Default::default() }
-    // );
-
     commands
         .spawn(CenterSphere {
             center: Vec3::new(0.0, 0.0, 0.0),
@@ -81,7 +76,6 @@ fn camera_sphere_select(
     windows: Res<Windows>,
 ) {
     let window = windows.get_primary().unwrap();
-
     if let Some(mouse_position) = window.cursor_position() {
         let (camera, camera_transform) = camera.single();
 
