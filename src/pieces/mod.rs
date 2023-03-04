@@ -23,7 +23,7 @@ impl Plugin for PiecePlugin {
         .add_startup_system(spawn_pieces)
         .add_system(piece_position)
         .add_system(piece_selected)
-        .add_system(selected_piece_update.after(piece_position));
+        .add_system(selected_piece_update.after(piece_position).after(piece_selected));
     }
 }
 
@@ -34,7 +34,7 @@ fn spawn_pieces(
     for x in 0..8 {
         spawn_piece(PiecePosition {x:x,y:6}, PieceTypes::Pawn, PieceColor::Black, &mut commands, &assets)
     }
-
+                      
     spawn_piece(PiecePosition {x:0,y:7}, PieceTypes::King, PieceColor::Black, &mut commands, &assets);
     spawn_piece(PiecePosition {x:1,y:7}, PieceTypes::Queen, PieceColor::Black, &mut commands, &assets);
     spawn_piece(PiecePosition {x:2,y:7}, PieceTypes::Bishop, PieceColor::Black, &mut commands, &assets);
@@ -93,7 +93,7 @@ fn piece_selected(
         if selected_position.x == piece.x && selected_position.y == piece.y {
             let thing = transform.local_y() * 0.1;
             transform.translation += thing;
-
+            
             if buttons.just_released(MouseButton::Left){
                 _commands.entity(entity).insert(SelectedPiece);
             }
@@ -119,20 +119,26 @@ fn piece_position(
 }
 
 fn selected_piece_update(
-    mut selected_piece: Query<&mut Transform, With<SelectedPiece>>,
+    mut commands: Commands,
+    mut selected_piece: Query<(&mut Transform, &mut PiecePosition, Entity), With<SelectedPiece>>,
     selected_square: Res<SelectedSquare>,
+    buttons: Res<Input<MouseButton>>,
     sphere: Query<&CenterSphere>,
 ){
-    for mut transform in &mut selected_piece {
+    for (mut transform, mut piece_position, entity) in &mut selected_piece {
         let around = map(selected_square.x as f32, 0.0, 8.0, -PI, PI) + PI / 8.0;
         let updown = map(selected_square.y as f32, 0.0, 8.0, -PI / 2.0, PI / 2.0) + PI / 2.0 / 8.0;
-    
+
         let position_ss = stacks_and_sectors_to_sphere_position(updown, around, sphere.single().radius);
         transform.translation = position_ss;
-    
+
         transform.look_at(position_ss * 2.0, Vec3::Y);
         transform.rotation *= Quat::from_euler(EulerRot::XYZ, -PI / 2.0, 0.0, 0.0);
+
+        if buttons.just_released(MouseButton::Left) {
+            piece_position.x = selected_square.x;
+            piece_position.y = selected_square.y;
+            commands.entity(entity).remove::<SelectedPiece>();
+        }
     }
-
-
 }
