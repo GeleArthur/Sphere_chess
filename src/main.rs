@@ -40,8 +40,8 @@ fn main() {
                 ..default()
             })
         )
-        .add_plugin(LogDiagnosticsPlugin::default())
-        .add_plugin(FrameTimeDiagnosticsPlugin::default())
+        // .add_plugin(LogDiagnosticsPlugin::default())
+        // .add_plugin(FrameTimeDiagnosticsPlugin::default())
         .add_plugin(WorldInspectorPlugin)
         .add_startup_system_to_stage(StartupStage::PreStartup, game_assets::asset_loading)
         .add_plugin(CameraPlugin)
@@ -49,6 +49,7 @@ fn main() {
         .add_plugin(PiecePlugin)
         .add_plugin(MaterialPlugin::<ChessSphereMaterial>::default())
         .add_plugin(MaterialPlugin::<PiecesMaterial>::default())
+        .add_event::<PieceClickedEvent>()
         .add_startup_system(setup_scene)
         .run();
 }

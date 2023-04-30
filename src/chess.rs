@@ -6,6 +6,7 @@ use crate::constant::*;
 use crate::game_assets::GameAssets;
 use crate::util::*;
 
+pub struct PieceClickedEvent(Entity);
 
 #[derive(Default, Resource)]
 pub struct SelectedSquare {
@@ -106,8 +107,6 @@ fn camera_sphere_select(
 
         let position_ss = stacks_and_sectors_to_sphere_position(updown, around, sphere.radius);
         giz_transform.translation = position_ss;
-
-        // println!("{},{}", selected.x, selected.y);
     }
 }
 

@@ -1,3 +1,5 @@
+use std::f32::consts::PI;
+
 use crate::*;
 use bevy::prelude::*;
 
@@ -32,7 +34,18 @@ fn camera_rotation(
     mut camera_query: Query<(&mut Transform, &mut CameraRotation), With<Camera3d>>,
     mut motion_evr: EventReader<MouseMotion>,
     buttons: Res<Input<MouseButton>>,
+    mut reverse_motion: Local<bool>
 ) {
+    let (mut camera, mut camera_rot) = camera_query.single_mut();
+
+    if buttons.just_pressed(MouseButton::Left) {
+        if camera_rot.y < PI+PI/2.0 && camera_rot.y > PI/2.0 {
+            *reverse_motion = true;
+        }else{
+            *reverse_motion = false;
+        }
+    }
+
     if motion_evr.len() == 0 {
         return;
     }
@@ -40,16 +53,22 @@ fn camera_rotation(
         return;
     }
 
-    let one_query = camera_query.single_mut();
-    let mut camera = one_query.0;
-    let mut camera_rot = one_query.1;
 
     for ev in motion_evr.iter() {
-        camera_rot.x -= ev.delta.x * 0.005;
+
+        if *reverse_motion {
+            camera_rot.x += ev.delta.x * 0.005;
+        }else{
+            camera_rot.x -= ev.delta.x * 0.005;
+        }
+
         camera_rot.y -= ev.delta.y * 0.005;
 
-        camera.rotation = Quat::from_axis_angle(Vec3::Y, camera_rot.x)
-            * Quat::from_axis_angle(Vec3::X, camera_rot.y);
+        camera_rot.x = normalize_rotation(camera_rot.x);
+        camera_rot.y = normalize_rotation(camera_rot.y);
+
+
+        camera.rotation = Quat::from_axis_angle(Vec3::Y, camera_rot.x) * Quat::from_axis_angle(Vec3::X, camera_rot.y);
 
         let forward = camera.forward();
         camera.translation = -forward * 5.0;
@@ -61,4 +80,16 @@ fn light_to_camera(
     mut light: Query<&mut Transform, (With<PointLight>, Without<Camera>)>,
 ) {
     light.single_mut().translation = camera.single().translation;
+}
+
+fn normalize_rotation(mut rotation: f32) -> f32{
+    if rotation > PI*2.0 {
+        rotation -= PI*2.0;
+        return normalize_rotation(rotation);
+    }else if rotation < 0.0 {
+        rotation += PI*2.0;
+        return normalize_rotation(rotation);
+    }
+
+    rotation
 }
