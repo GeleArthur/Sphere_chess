@@ -31,7 +31,7 @@ fn main() {
             DefaultPlugins.set(WindowPlugin {
                 window: WindowDescriptor {
                     title: "Sphere chess".to_owned(),
-                    present_mode: PresentMode::AutoNoVsync,
+                    present_mode: PresentMode::AutoVsync,
                     ..default()
                 },
                 ..default()

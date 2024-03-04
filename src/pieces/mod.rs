@@ -85,14 +85,25 @@ fn spawn_piece(position: PiecePosition, piece_type: PieceTypes, color: PieceColo
 
 fn piece_selected(
     mut _commands: Commands,
+    // world: &mut bevy::prelude::World,
+    selected_piece: Query<Option<&SelectedPiece>>,
     mut pieces: Query<(&mut Transform, &PiecePosition, Entity)>,
     selected_position: Res<SelectedSquare>,
     buttons: Res<Input<MouseButton>>
 ){
+    if selected_position.selecting_square == false {
+        return;
+    }
+
     for (mut transform, piece, entity) in &mut pieces {
         if selected_position.x == piece.x && selected_position.y == piece.y {
             let thing = transform.local_y() * 0.1;
             transform.translation += thing;
+
+            if selected_piece.is_empty() == false {
+                println!("EMPTY");
+                return;
+            }
             
             if buttons.just_released(MouseButton::Left){
                 _commands.entity(entity).insert(SelectedPiece);
@@ -121,6 +132,7 @@ fn piece_position(
 fn selected_piece_update(
     mut commands: Commands,
     mut selected_piece: Query<(&mut Transform, &mut PiecePosition, Entity), With<SelectedPiece>>,
+    board: Query<&PiecePosition, Without<SelectedPiece>>,
     selected_square: Res<SelectedSquare>,
     buttons: Res<Input<MouseButton>>,
     sphere: Query<&CenterSphere>,
@@ -135,10 +147,22 @@ fn selected_piece_update(
         transform.look_at(position_ss * 2.0, Vec3::Y);
         transform.rotation *= Quat::from_euler(EulerRot::XYZ, -PI / 2.0, 0.0, 0.0);
 
-        if buttons.just_released(MouseButton::Left) {
+        if buttons.just_released(MouseButton::Left) && selected_square.selecting_square == true {
+            
+            for position in &board {
+                if selected_square.x == position.x && selected_square.y == position.y {
+                    return;
+                }
+            }
+
             piece_position.x = selected_square.x;
             piece_position.y = selected_square.y;
             commands.entity(entity).remove::<SelectedPiece>();
         }
     }
+}
+
+
+fn piece_location_solver(mut commands: Commands, piece_type: PieceTypes, PiecePosition { x, y }: PiecePosition){
+    
 }

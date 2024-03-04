@@ -10,6 +10,7 @@ pub struct PieceClickedEvent(Entity);
 
 #[derive(Default, Resource)]
 pub struct SelectedSquare {
+    pub selecting_square: bool,
     pub x: i8,
     pub y: i8
 }
@@ -88,6 +89,7 @@ fn camera_sphere_select(
         let ray_hit = raycast_ball(raycasted, sphere.center, sphere.radius);
 
         if ray_hit.is_none() {
+            selected.selecting_square = false;
             return;
         }
 
@@ -101,6 +103,8 @@ fn camera_sphere_select(
         
         selected.x = f32::floor(around * 8.0) as i8;
         selected.y = f32::floor(updown * 8.0) as i8;
+        selected.selecting_square = true;
+
 
         let around = util::map(selected.x as f32, 0.0, 8.0, -std::f32::consts::PI, std::f32::consts::PI);
         let updown = util::map(selected.y as f32, 0.0, 8.0, -std::f32::consts::PI/2.0, std::f32::consts::PI/2.0,);
