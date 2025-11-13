@@ -14,9 +14,9 @@ pub struct CameraPlugin;
 impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
         app.register_type::<CameraRotation>()
-            .add_startup_system(spawn_camera)
-            .add_system(camera_rotation)
-            .add_system(light_to_camera);
+            .add_systems(Startup, spawn_camera)
+            .add_systems(Update, camera_rotation)
+            .add_systems(Update,light_to_camera);
     }
 }
 

@@ -45,7 +45,7 @@ pub fn asset_loading(
         }),
 
         board_material: materials_custom.add(ChessSphereMaterial {
-            color: Color::WHITE,
+            color: Color::WHITE.into(),
             color_texture: Some(assets.load("board.png")),
         }),
     })

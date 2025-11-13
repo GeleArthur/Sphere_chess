@@ -1,11 +1,11 @@
 use bevy::prelude::*;
-use bevy::prelude::shape::UVSphere;
+use bevy::window::PrimaryWindow;
 
 use crate::*;
-use crate::constant::*;
 use crate::game_assets::GameAssets;
 use crate::util::*;
 
+#[derive(Message)]
 pub struct PieceClickedEvent(Entity);
 
 #[derive(Default, Resource)]
@@ -35,8 +35,8 @@ impl Plugin for ChessPlugin {
     fn build(&self, app: &mut App) {
         app
         .init_resource::<SelectedSquare>()
-        .add_startup_system(spawn_board.label(BOARD_LABEL))
-        .add_system(camera_sphere_select)
+        .add_systems(Startup, spawn_board) // Might be wrong
+        .add_systems(Update,camera_sphere_select)
         ;
     }
 }
@@ -51,40 +51,35 @@ fn spawn_board(
             center: Vec3::new(0.0, 0.0, 0.0),
             radius: 1.0,
         })
-        .insert(MaterialMeshBundle {
-            mesh: meshes.add(Mesh::from(UVSphere {
+        .insert((
+            Mesh3d(meshes.add(Mesh::from(Sphere {
                 radius: 1.0,
-                sectors: 8*4,
-                stacks: 8*4,
-                ..Default::default()
-            })),
-            material: assets.board_material.clone(),
-            transform: Transform::from_xyz(0.0, 0.0, 0.0).with_rotation(Quat::from_euler(
+            }))),
+            MeshMaterial3d(assets.board_material.clone()),
+            Transform::from_xyz(0.0, 0.0, 0.0).with_rotation(Quat::from_euler(
                 EulerRot::XYZ,
                 -std::f32::consts::PI / 2.0,
                 0.0,
                 0.0,
             )),
-            ..Default::default()
-        })
+        ))
         .insert(Name::new("Sphere"));
 }
 
 fn camera_sphere_select(
-    camera: Query<(&Camera, &GlobalTransform)>,
+    camera: Single<(&Camera, &GlobalTransform)>,
     mut gizmos_cube: Query<&mut Transform, With<GizmosCube>>,
     sphere: Query<&CenterSphere>,
     mut selected: ResMut<SelectedSquare>,
-    windows: Res<Windows>,
+    primary_window: Single<&Window, With<PrimaryWindow>>,
 ) {
-    let window = windows.get_primary().unwrap();
-    if let Some(mouse_position) = window.cursor_position() {
-        let (camera, camera_transform) = camera.single();
+    if let Some(mouse_position) = primary_window.cursor_position() {
+        let (camera, camera_transform) = *camera;
 
         let raycasted = camera.viewport_to_world(camera_transform, mouse_position).unwrap();
-        let mut giz_transform = gizmos_cube.single_mut();
+        let mut giz_transform = gizmos_cube.single_mut().unwrap();
 
-        let sphere = sphere.single();
+        let sphere = sphere.single().unwrap();
 
         let ray_hit = raycast_ball(raycasted, sphere.center, sphere.radius);
 

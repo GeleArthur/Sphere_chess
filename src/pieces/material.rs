@@ -1,7 +1,5 @@
 use bevy::{
-    prelude::*,
-    reflect::TypeUuid,
-    render::render_resource::{AsBindGroup, ShaderRef}, asset::AssetPath,
+    asset::{AssetPath, uuid}, prelude::*, render::render_resource::AsBindGroup, shader::ShaderRef
 };
 
 impl Material for PiecesMaterial {
@@ -10,8 +8,7 @@ impl Material for PiecesMaterial {
     }
 }
 
-#[derive(AsBindGroup, TypeUuid, Debug, Clone)]
-#[uuid = "b7b0f6e5-5ab9-4191-8317-cb91af729deb"]
+#[derive(Asset, TypePath, AsBindGroup, Clone, Debug)]
 pub struct PiecesMaterial {
     #[uniform(0)]
     pub base_color: Color,

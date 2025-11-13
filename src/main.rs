@@ -15,9 +15,7 @@ use sphere_material::ChessSphereMaterial;
 use pieces::*;
 
 use bevy::{
-    input::mouse::MouseMotion,
-    math::*,
-    prelude::*, diagnostic::{LogDiagnosticsPlugin, FrameTimeDiagnosticsPlugin}, window::PresentMode,
+    prelude::*, window::PresentMode,
 };
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
@@ -29,28 +27,28 @@ fn main() {
     App::new()
         .add_plugins(
             DefaultPlugins.set(WindowPlugin {
-                window: WindowDescriptor {
+                primary_window: Some(Window {
                     title: "Sphere chess".to_owned(),
                     present_mode: PresentMode::AutoVsync,
                     ..default()
-                },
+                }),
                 ..default()
             }).set(AssetPlugin {
-                watch_for_changes: true,
+                watch_for_changes_override: Some(true),
                 ..default()
             })
         )
         // .add_plugin(LogDiagnosticsPlugin::default())
         // .add_plugin(FrameTimeDiagnosticsPlugin::default())
-        .add_plugin(WorldInspectorPlugin)
-        .add_startup_system_to_stage(StartupStage::PreStartup, game_assets::asset_loading)
-        .add_plugin(CameraPlugin)
-        .add_plugin(ChessPlugin)
-        .add_plugin(PiecePlugin)
-        .add_plugin(MaterialPlugin::<ChessSphereMaterial>::default())
-        .add_plugin(MaterialPlugin::<PiecesMaterial>::default())
-        .add_event::<PieceClickedEvent>()
-        .add_startup_system(setup_scene)
+        .add_plugins(WorldInspectorPlugin::new())
+        // .add_startup_system_to_stage(StartupStage::PreStartup, game_assets::asset_loading)
+        .add_plugins(CameraPlugin)
+        .add_plugins(ChessPlugin)
+        .add_plugins(PiecePlugin)
+        .add_plugins(MaterialPlugin::<ChessSphereMaterial>::default())
+        .add_plugins(MaterialPlugin::<PiecesMaterial>::default())
+        .add_message::<PieceClickedEvent>()
+        .add_systems(Startup,setup_scene)
         .run();
 }
 
@@ -59,27 +57,27 @@ fn setup_scene(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>
 ) {
-    commands.spawn(PointLightBundle {
-        point_light: PointLight {
+    commands.spawn((
+         PointLight {
             intensity: 1500.0,
             shadows_enabled: true,
             ..Default::default()
         },
-        transform: Transform::from_xyz(0.0, 2.0, 1.0),
-        ..Default::default()
-    });
+        Transform::from_xyz(0.0, 2.0, 1.0)
+    ));
+    commands.spawn((
+        Mesh3d(meshes.add(Mesh::from(Sphere::new(0.1)))), 
+        MeshMaterial3d(materials.add(Color::srgb_u8(255, 0, 10))), 
+        Transform::from_xyz(0.0, 0.0, 0.0) 
+    ));
 
     commands
-        .spawn(PbrBundle {
-            mesh: meshes.add(
-                Mesh::from(shape::UVSphere {
-                    radius: 0.1,
-                    ..Default::default()
-                })
-            ),
-            material: materials.add(Color::rgb(1.0, 0.0, 0.1).into()),
-            ..Default::default()
-        })
+        .spawn(( 
+            Mesh3d(meshes.add(
+                Mesh::from(Sphere::new(0.1))
+            )),
+            MeshMaterial3d(materials.add(Color::srgb_u8(255, 0, 10))),
+        ))
         .insert(GizmosCube)
         .insert(Name::new("Gizmos"));
 }

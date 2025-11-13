@@ -29,7 +29,7 @@ pub fn map(n: f32, start1: f32, stop1: f32, start2: f32, stop2: f32) -> f32 {
 //     return Some((near, ray_direction));
 // }
 
-pub fn raycast_ball(ray_cast: Ray, sphere_position: Vec3, sphere_radius: f32) -> Option<Vec3> {
+pub fn raycast_ball(ray_cast: Ray3d, sphere_position: Vec3, sphere_radius: f32) -> Option<Vec3> {
     let to_sphere = ray_cast.origin - sphere_position;
 
     let v = to_sphere - Vec3::project_onto(to_sphere, ray_cast.direction.normalize());
