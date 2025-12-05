@@ -32,20 +32,20 @@ pub fn asset_loading(
         king: assets.load("pieces.glb#Mesh0/Primitive0"),
 
         black_material: pieces_materials.add(PiecesMaterial {
-            base_color: Color::BLACK,
-            base_color_outline: Color::WHITE,
+            base_color: LinearRgba::BLACK,
+            base_color_outline: LinearRgba::WHITE,
             color_texture: Some(assets.load("white.png")),
         }),
 
         white_material: pieces_materials.add(PiecesMaterial {
-            base_color: Color::WHITE,
-            base_color_outline: Color::BLACK,
+            base_color: LinearRgba::WHITE,
+            base_color_outline: LinearRgba::BLACK,
             
             color_texture: Some(assets.load("white.png")),
         }),
 
         board_material: materials_custom.add(ChessSphereMaterial {
-            color: Color::WHITE.into(),
+            color: LinearRgba::WHITE,
             color_texture: Some(assets.load("board.png")),
         }),
     })

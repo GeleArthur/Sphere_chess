@@ -1,7 +1,7 @@
 use std::f32::consts::PI;
 
 use crate::*;
-use bevy::prelude::*;
+use bevy::{input::mouse::MouseMotion, prelude::*};
 
 #[derive(Reflect, Component, Default)]
 #[reflect(Component)]
@@ -22,21 +22,23 @@ impl Plugin for CameraPlugin {
 
 fn spawn_camera(mut commands: Commands) {
     commands
-        .spawn(Camera3dBundle {
-            transform: Transform::from_xyz(0.0, 0.0, 5.0),
-            ..Default::default()
-        })
-        .insert(Name::new("Camera"))
-        .insert(CameraRotation { x: 0.0, y: 0.0 });
+        .spawn((Camera3d::default(), Transform::from_xyz(0.0, 0.0, 5.0), Name::new("Camera"), CameraRotation{x:0.0, y:0.0}));
+
+
+            // transform: Transform::from_xyz(0.0, 0.0, 5.0),
+            // ..Default::default()
+        // })
+        // .insert(Name::new("Camera"))
+        // .insert(CameraRotation { x: 0.0, y: 0.0 });
 }
 
 fn camera_rotation(
-    mut camera_query: Query<(&mut Transform, &mut CameraRotation), With<Camera3d>>,
-    mut motion_evr: EventReader<MouseMotion>,
-    buttons: Res<Input<MouseButton>>,
+    camera_query: Single<(&mut Transform, &mut CameraRotation), With<Camera3d>>,
+    mut mouse_move: MessageReader<MouseMotion>,
+    buttons: Res<ButtonInput<MouseButton>>,
     mut reverse_motion: Local<bool>
 ) {
-    let (mut camera, mut camera_rot) = camera_query.single_mut();
+    let (mut camera, mut camera_rot) = camera_query.into_inner();
 
     if buttons.just_pressed(MouseButton::Left) {
         if camera_rot.y < PI+PI/2.0 && camera_rot.y > PI/2.0 {
@@ -46,15 +48,12 @@ fn camera_rotation(
         }
     }
 
-    if motion_evr.len() == 0 {
-        return;
-    }
     if buttons.pressed(MouseButton::Left) == false {
         return;
     }
 
 
-    for ev in motion_evr.iter() {
+    for ev in mouse_move.read() {
 
         if *reverse_motion {
             camera_rot.x += ev.delta.x * 0.005;
@@ -79,7 +78,7 @@ fn light_to_camera(
     camera: Query<&Transform, (With<Camera>, Without<PointLight>)>,
     mut light: Query<&mut Transform, (With<PointLight>, Without<Camera>)>,
 ) {
-    light.single_mut().translation = camera.single().translation;
+    light.single_mut().unwrap().translation = camera.single().unwrap().translation;
 }
 
 fn normalize_rotation(mut rotation: f32) -> f32{

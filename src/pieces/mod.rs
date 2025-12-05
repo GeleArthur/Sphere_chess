@@ -5,6 +5,7 @@ mod material;
 
 use crate::chess::SelectedPiece;
 use crate::chess::SelectedSquare;
+use crate::game_assets;
 use crate::pieces::types::*;
 use crate::pieces::position::*;
 pub use crate::pieces::material::*;
@@ -20,7 +21,7 @@ impl Plugin for PiecePlugin {
         app
         .register_type::<PiecePosition>()
         .register_type::<PieceTypes>()
-        .add_systems(Startup,spawn_pieces)
+        .add_systems(Startup,spawn_pieces.after(game_assets::asset_loading))
         .add_systems(Update,(piece_position,piece_selected))
         .add_systems(Update, selected_piece_update.after(piece_position).after(piece_selected));
     }

@@ -17,7 +17,7 @@ use pieces::*;
 use bevy::{
     prelude::*, window::PresentMode,
 };
-use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use bevy_inspector_egui::{bevy_egui::EguiPlugin, quick::WorldInspectorPlugin};
 
 #[derive(Reflect, Component, Default)]
 #[reflect(Component)]
@@ -40,15 +40,16 @@ fn main() {
         )
         // .add_plugin(LogDiagnosticsPlugin::default())
         // .add_plugin(FrameTimeDiagnosticsPlugin::default())
+        .add_plugins(EguiPlugin::default())
         .add_plugins(WorldInspectorPlugin::new())
-        // .add_startup_system_to_stage(StartupStage::PreStartup, game_assets::asset_loading)
+        .add_systems(Startup, game_assets::asset_loading)
         .add_plugins(CameraPlugin)
         .add_plugins(ChessPlugin)
         .add_plugins(PiecePlugin)
         .add_plugins(MaterialPlugin::<ChessSphereMaterial>::default())
         .add_plugins(MaterialPlugin::<PiecesMaterial>::default())
         .add_message::<PieceClickedEvent>()
-        .add_systems(Startup,setup_scene)
+        .add_systems(Startup,setup_scene.after(game_assets::asset_loading))
         .run();
 }
 

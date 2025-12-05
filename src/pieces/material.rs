@@ -11,9 +11,9 @@ impl Material for PiecesMaterial {
 #[derive(Asset, TypePath, AsBindGroup, Clone, Debug)]
 pub struct PiecesMaterial {
     #[uniform(0)]
-    pub base_color: Color,
+    pub base_color: LinearRgba,
     #[uniform(1)]
-    pub base_color_outline: Color,
+    pub base_color_outline: LinearRgba,
     #[texture(2)]
     #[sampler(3)]
     pub color_texture: Option<Handle<Image>>,

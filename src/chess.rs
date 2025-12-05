@@ -35,7 +35,7 @@ impl Plugin for ChessPlugin {
     fn build(&self, app: &mut App) {
         app
         .init_resource::<SelectedSquare>()
-        .add_systems(Startup, spawn_board) // Might be wrong
+        .add_systems(Startup, spawn_board.after(game_assets::asset_loading)) // Might be wrong
         .add_systems(Update,camera_sphere_select)
         ;
     }
