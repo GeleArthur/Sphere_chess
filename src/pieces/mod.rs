@@ -20,10 +20,9 @@ impl Plugin for PiecePlugin {
         app
         .register_type::<PiecePosition>()
         .register_type::<PieceTypes>()
-        .add_startup_system(spawn_pieces)
-        .add_system(piece_position)
-        .add_system(piece_selected)
-        .add_system(selected_piece_update.after(piece_position).after(piece_selected));
+        .add_systems(Startup,spawn_pieces)
+        .add_systems(Update,(piece_position,piece_selected))
+        .add_systems(Update, selected_piece_update.after(piece_position).after(piece_selected));
     }
 }
 
@@ -73,14 +72,14 @@ fn spawn_piece(position: PiecePosition, piece_type: PieceTypes, color: PieceColo
         PieceColor::Black => assets.black_material.clone(),
     };
 
-    commands.spawn(MaterialMeshBundle{
-        mesh,
-        material,
-        ..Default::default()
-    })
-    .insert(piece_type)
-    .insert(color)
-    .insert(position);
+    commands.spawn((Mesh3d(mesh), MeshMaterial3d(material), piece_type, color, position));
+        // mesh,
+        // material,
+        // ..Default::default()
+    // })
+    // .insert(piece_type)
+    // .insert(color)
+    // .insert(position);
 }
 
 fn piece_selected(
@@ -89,7 +88,7 @@ fn piece_selected(
     selected_piece: Query<Option<&SelectedPiece>>,
     mut pieces: Query<(&mut Transform, &PiecePosition, Entity)>,
     selected_position: Res<SelectedSquare>,
-    buttons: Res<Input<MouseButton>>
+    buttons: Res<ButtonInput<MouseButton>>
 ){
     if selected_position.selecting_square == false {
         return;
@@ -121,7 +120,7 @@ fn piece_position(
         let around = map(piece.x as f32, 0.0, 8.0, -PI, PI) + PI / 8.0;
         let updown = map(piece.y as f32, 0.0, 8.0, -PI / 2.0, PI / 2.0) + PI / 2.0 / 8.0;
 
-        let position_ss = stacks_and_sectors_to_sphere_position(updown, around, sphere.single().radius);
+        let position_ss = stacks_and_sectors_to_sphere_position(updown, around, sphere.single().unwrap().radius);
         transform.translation = position_ss;
 
         transform.look_at(position_ss * 2.0, Vec3::Y);
@@ -134,14 +133,14 @@ fn selected_piece_update(
     mut selected_piece: Query<(&mut Transform, &mut PiecePosition, Entity), With<SelectedPiece>>,
     board: Query<&PiecePosition, Without<SelectedPiece>>,
     selected_square: Res<SelectedSquare>,
-    buttons: Res<Input<MouseButton>>,
+    buttons: Res<ButtonInput<MouseButton>>,
     sphere: Query<&CenterSphere>,
 ){
     for (mut transform, mut piece_position, entity) in &mut selected_piece {
         let around = map(selected_square.x as f32, 0.0, 8.0, -PI, PI) + PI / 8.0;
         let updown = map(selected_square.y as f32, 0.0, 8.0, -PI / 2.0, PI / 2.0) + PI / 2.0 / 8.0;
 
-        let position_ss = stacks_and_sectors_to_sphere_position(updown, around, sphere.single().radius);
+        let position_ss = stacks_and_sectors_to_sphere_position(updown, around, sphere.single().unwrap().radius);
         transform.translation = position_ss;
 
         transform.look_at(position_ss * 2.0, Vec3::Y);
