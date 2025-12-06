@@ -1,5 +1,5 @@
 use bevy::{
-    asset::{AssetPath, uuid}, prelude::*, render::render_resource::AsBindGroup, shader::ShaderRef
+    asset::{AssetPath}, prelude::*, render::render_resource::AsBindGroup, shader::ShaderRef
 };
 
 impl Material for PiecesMaterial {

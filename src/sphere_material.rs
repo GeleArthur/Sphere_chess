@@ -1,6 +1,6 @@
 
 use bevy::{
-    asset::AssetPath, prelude::*, render::render_resource::AsBindGroup, shader::ShaderRef
+    prelude::*, render::render_resource::AsBindGroup, shader::ShaderRef
 };
 
 impl Material for ChessSphereMaterial {

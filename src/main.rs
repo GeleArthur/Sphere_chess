@@ -3,7 +3,6 @@
 // https://www.youtube.com/watch?v=pWYt348Ki5g
 mod camera;
 mod chess;
-mod constant;
 mod game_assets;
 mod pieces;
 mod util;

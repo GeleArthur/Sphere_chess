@@ -5,41 +5,18 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "ASSS",
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'sphere_chess'",
-            "cargo": {
-                "args": [
-                    "build",
-                    "--bin=sphere_chess",
-                    "--package=sphere_chess"
-                ],
-                "filter": {
-                    "name": "sphere_chess",
-                    "kind": "bin"
-                }
-            },
+            "program": "${workspaceFolder}/target/debug/sphere_chess",
             "args": [],
-            "cwd": "${workspaceFolder}"
-        },
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Debug unit tests in executable 'sphere_chess'",
-            "cargo": {
-                "args": [
-                    "test",
-                    "--no-run",
-                    "--bin=sphere_chess",
-                    "--package=sphere_chess"
-                ],
-                "filter": {
-                    "name": "sphere_chess",
-                    "kind": "bin"
-                }
+            "env": {
+                "WGPU_ALLOW_UNDERLYING_NONCOMPLIANT_ADAPTER=1":"1",
+                "XCURSOR_THEME":"Adwaita",
+                "PATH": "${workspaceFolder}/target/debug/deps;${env:PATH}",
             },
-            "args": [],
-            "cwd": "${workspaceFolder}"
+            "cwd": "${workspaceFolder}",
+            "preLaunchTask": "rust: cargo build",
         }
     ]
 }

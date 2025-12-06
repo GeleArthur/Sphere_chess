@@ -1,6 +1,5 @@
 use std::f32::consts::PI;
 
-use crate::*;
 use bevy::{input::mouse::MouseMotion, prelude::*};
 
 #[derive(Reflect, Component, Default)]
@@ -33,10 +32,10 @@ fn spawn_camera(mut commands: Commands) {
 }
 
 fn camera_rotation(
-    camera_query: Single<(&mut Transform, &mut CameraRotation), With<Camera3d>>,
     mut mouse_move: MessageReader<MouseMotion>,
+    camera_query: Single<(&mut Transform, &mut CameraRotation), With<Camera3d>>,
     buttons: Res<ButtonInput<MouseButton>>,
-    mut reverse_motion: Local<bool>
+    mut reverse_motion: Local<bool>,
 ) {
     let (mut camera, mut camera_rot) = camera_query.into_inner();
 
@@ -54,7 +53,6 @@ fn camera_rotation(
 
 
     for ev in mouse_move.read() {
-
         if *reverse_motion {
             camera_rot.x += ev.delta.x * 0.005;
         }else{

@@ -163,6 +163,3 @@ fn selected_piece_update(
 }
 
 
-fn piece_location_solver(mut commands: Commands, piece_type: PieceTypes, PiecePosition { x, y }: PiecePosition){
-    
-}

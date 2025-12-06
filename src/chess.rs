@@ -6,7 +6,7 @@ use crate::game_assets::GameAssets;
 use crate::util::*;
 
 #[derive(Message)]
-pub struct PieceClickedEvent(Entity);
+pub struct PieceClickedEvent;
 
 #[derive(Default, Resource)]
 pub struct SelectedSquare {
@@ -25,10 +25,10 @@ pub struct CenterSphere {
     pub radius: f32,
 }
 
-#[derive(Component, Default)]
-pub struct ChessBoard {
-    pub grid: [[Option<Entity>; 8]; 8],
-}
+// #[derive(Component, Default)]
+// pub struct ChessBoard {
+//     pub grid: [[Option<Entity>; 8]; 8],
+// }
 pub struct ChessPlugin;
 
 impl Plugin for ChessPlugin {
@@ -56,12 +56,7 @@ fn spawn_board(
                 radius: 1.0,
             }))),
             MeshMaterial3d(assets.board_material.clone()),
-            Transform::from_xyz(0.0, 0.0, 0.0).with_rotation(Quat::from_euler(
-                EulerRot::XYZ,
-                -std::f32::consts::PI / 2.0,
-                0.0,
-                0.0,
-            )),
+            Transform::from_xyz(0.0, 0.0, 0.0),
         ))
         .insert(Name::new("Sphere"));
 }
